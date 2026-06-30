@@ -50,8 +50,12 @@ class Tenant extends Model
         return $this->hasOne(AiSetting::class);
     }
 
-    public function whatsappSession()
+    public function whatsappSessions()
     {
-        return $this->hasOne(WhatsappSession::class);
+        return $this->hasMany(WhatsappSession::class);
     }
+    // public function whatsappSession()
+    // {
+    //     return $this->hasOne(WhatsappSession::class);
+    // }
 }
