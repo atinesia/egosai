@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Tenant extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name', 'business_category', 'description', 'slug', 'plan',
+        'is_active', 'trial_ends_at', 'onboarding_completed_at',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'trial_ends_at' => 'datetime',
+        'onboarding_completed_at' => 'datetime',
+    ];
+
+    public function isOnboarded(): bool
+    {
+        return ! is_null($this->onboarding_completed_at);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class);
+    }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
+    public function knowledgeBases()
+    {
+        return $this->hasMany(KnowledgeBase::class);
+    }
+
+    public function aiSetting()
+    {
+        return $this->hasOne(AiSetting::class);
+    }
+
+    public function whatsappSession()
+    {
+        return $this->hasOne(WhatsappSession::class);
+    }
+}
