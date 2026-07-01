@@ -126,7 +126,7 @@
                 <button type="submit"
                         wire:loading.attr="disabled" wire:target="sendReply"
                         class="bg-teal-600 hover:bg-teal-700 disabled:opacity-70 disabled:cursor-not-allowed
-                               text-white px-4 rounded-lg text-sm font-medium flex items-center gap-2 min-w-[88px] justify-center">
+                               text-white px-4 rounded-lg text-sm font-medium flex items-center gap-2 min-w-22 justify-center">
                     <span wire:loading.remove wire:target="sendReply">Kirim</span>
                     <span wire:loading wire:target="sendReply" class="btn-spinner"></span>
                 </button>
