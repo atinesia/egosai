@@ -31,6 +31,7 @@ class Onboarding extends Component
     // Step 4 - WhatsApp
     public ?WhatsappSession $waSession = null;
     public ?string $waErrorMessage = null;
+    public string $waLabel = 'CS Utama';
 
     public function mount(): void
     {
@@ -154,9 +155,10 @@ class Onboarding extends Component
 
         if (! $this->waSession) {
             $this->waSession = WhatsappSession::create([
-                'tenant_id' => $tenant->id,
+                'tenant_id'  => $tenant->id,
                 'session_id' => 'tenant-' . $tenant->id . '-' . Str::random(6),
-                'status' => 'qr_pending',
+                'label'      => $this->waLabel ?: 'CS Utama',
+                'status'     => 'qr_pending',
             ]);
         } else {
             $this->waSession->update(['status' => 'qr_pending', 'qr_code' => null]);

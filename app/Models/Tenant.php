@@ -50,12 +50,45 @@ class Tenant extends Model
         return $this->hasOne(AiSetting::class);
     }
 
+    /**
+     * @deprecated Tenant sekarang bisa punya lebih dari 1 nomor WhatsApp
+     * (paket Pro/Enterprise). Method ini dipertahankan supaya kode lama yang
+     * masih panggil `$tenant->whatsappSession` (singular) tidak langsung
+     * rusak — selalu mengembalikan nomor yang PERTAMA terhubung saja.
+     * Pakai `whatsappSessions()` untuk kode baru.
+     */
+    public function whatsappSession()
+    {
+        return $this->hasOne(WhatsappSession::class)->oldestOfMany();
+    }
+
     public function whatsappSessions()
     {
         return $this->hasMany(WhatsappSession::class);
     }
-    // public function whatsappSession()
-    // {
-    //     return $this->hasOne(WhatsappSession::class);
-    // }
+
+    /**
+     * Batas jumlah nomor WhatsApp yang boleh dihubungkan, sesuai paket.
+     * null artinya tidak terbatas (Enterprise/custom).
+     */
+    public function maxWhatsappNumbers(): ?int
+    {
+        return match ($this->plan) {
+            'trial', 'starter' => 1,
+            'pro' => 3,
+            'enterprise' => null,
+            default => 1,
+        };
+    }
+
+    public function canAddWhatsappNumber(): bool
+    {
+        $max = $this->maxWhatsappNumbers();
+
+        if (is_null($max)) {
+            return true;
+        }
+
+        return $this->whatsappSessions()->count() < $max;
+    }
 }

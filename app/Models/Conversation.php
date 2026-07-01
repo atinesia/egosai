@@ -10,7 +10,7 @@ class Conversation extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id', 'contact_id', 'assigned_user_id', 'channel',
+        'tenant_id', 'contact_id', 'whatsapp_session_id', 'assigned_user_id', 'channel',
         'status', 'ai_active', 'last_message_at',
     ];
 
@@ -22,6 +22,11 @@ class Conversation extends Model
     public function contact()
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function whatsappSession()
+    {
+        return $this->belongsTo(WhatsappSession::class);
     }
 
     public function assignedUser()

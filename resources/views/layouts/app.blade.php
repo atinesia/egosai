@@ -20,7 +20,7 @@
                 <a href="{{ route('dashboard.contacts') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.contacts') ? 'bg-slate-800 text-white' : '' }}">👥 Kontak</a>
                 <a href="{{ route('dashboard.knowledge-base') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.knowledge-base') ? 'bg-slate-800 text-white' : '' }}">📚 Knowledge Base</a>
                 <a href="{{ route('dashboard.ai-settings') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.ai-settings') ? 'bg-slate-800 text-white' : '' }}">🤖 Pengaturan AI</a>
-                <a href="{{ route('dashboard.whatsapp') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.whatsapp') ? 'bg-slate-800 text-white' : '' }}">📱 Koneksi WhatsApp</a>
+                <a href="{{ route('dashboard.whatsapp') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.whatsapp') ? 'bg-slate-800 text-white' : '' }}">📱 Nomor WhatsApp</a>
             </nav>
             <div class="px-3 py-4 border-t border-slate-800">
                 <form method="POST" action="{{ route('logout') }}" x-data="{ submitting: false }" @submit="submitting = true">

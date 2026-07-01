@@ -17,7 +17,7 @@
                 @foreach ($contacts as $c)
                     <tr>
                         <td class="px-4 py-2.5">{{ $c->name ?? '-' }}</td>
-                        <td class="px-4 py-2.5">{{ $c->wa_number }}</td>
+                        <td class="px-4 py-2.5">{{ $c->display_number }}</td>
                         <td class="px-4 py-2.5 text-slate-500">{{ $c->created_at->format('d M Y') }}</td>
                     </tr>
                 @endforeach

@@ -16,8 +16,7 @@ class WhatsappWebhookController extends Controller
     public function __construct(
         protected GroqService $groq,
         protected WhatsappService $wa,
-    ) {
-    }
+    ) {}
 
     /**
      * Dipanggil Node service tiap kali ada perubahan status QR / koneksi sesi.
@@ -28,9 +27,9 @@ class WhatsappWebhookController extends Controller
         $this->verifySecret($request);
 
         $data = $request->validate([
-            'session_id' => 'required|string',
-            'status' => 'required|string',
-            'qr_code' => 'nullable|string',
+            'session_id'   => 'required|string',
+            'status'       => 'required|string',
+            'qr_code'      => 'nullable|string',
             'phone_number' => 'nullable|string',
         ]);
 
@@ -43,8 +42,8 @@ class WhatsappWebhookController extends Controller
         }
 
         $session->update([
-            'status' => $data['status'],
-            'qr_code' => $data['qr_code'] ?? $session->qr_code,
+            'status'       => $data['status'],
+            'qr_code'      => $data['qr_code'] ?? $session->qr_code,
             'phone_number' => $data['phone_number'] ?? $session->phone_number,
         ]);
 
@@ -60,10 +59,10 @@ class WhatsappWebhookController extends Controller
         $this->verifySecret($request);
 
         $data = $request->validate([
-            'session_id' => 'required|string',
-            'from' => 'required|string',
-            'name' => 'nullable|string',
-            'text' => 'required|string',
+            'session_id'   => 'required|string',
+            'from'         => 'required|string',
+            'name'         => 'nullable|string',
+            'text'         => 'required|string',
             'wa_message_id' => 'nullable|string',
         ]);
 
@@ -79,30 +78,43 @@ class WhatsappWebhookController extends Controller
 
         $contact = Contact::withoutGlobalScopes()->firstOrCreate(
             ['tenant_id' => $tenant->id, 'wa_number' => $data['from']],
-            ['name' => $data['name'] ?? $data['from']]
+            ['name' => $data['name'] ?? null]
         );
 
+        // Conversation di-scope per sesi — jadi kalau satu tenant punya 3 nomor,
+        // inbox tiap nomor terpisah (tidak tercampur).
         $conversation = Conversation::withoutGlobalScopes()->firstOrCreate(
-            ['tenant_id' => $tenant->id, 'contact_id' => $contact->id, 'status' => 'open'],
+            [
+                'tenant_id'           => $tenant->id,
+                'contact_id'          => $contact->id,
+                'whatsapp_session_id' => $session->id,
+                'status'              => 'open',
+            ],
             ['channel' => 'whatsapp', 'ai_active' => true]
         );
         $conversation->update(['last_message_at' => now()]);
 
         Message::create([
             'conversation_id' => $conversation->id,
-            'sender_type' => 'contact',
-            'content' => $data['text'],
-            'wa_message_id' => $data['wa_message_id'] ?? null,
+            'sender_type'     => 'contact',
+            'content'         => $data['text'],
+            'wa_message_id'   => $data['wa_message_id'] ?? null,
         ]);
 
-        // Minta balasan AI (akan null kalau AI nonaktif utk conversation/tenant ini)
-        $reply = $this->groq->generateReply($conversation, $data['text']);
+        // AI aktif hanya kalau:
+        //   1. global AI setting tenant aktif
+        //   2. is_ai_active di sesi ini aktif (bisa per-nomor)
+        //   3. ai_active di conversation ini aktif (agent belum ambil alih)
+        $aiEnabled = $session->is_ai_active && $conversation->ai_active;
+        $reply = $aiEnabled
+            ? $this->groq->generateReply($conversation, $data['text'])
+            : null;
 
         if ($reply) {
             Message::create([
                 'conversation_id' => $conversation->id,
-                'sender_type' => 'ai',
-                'content' => $reply,
+                'sender_type'     => 'ai',
+                'content'         => $reply,
             ]);
 
             $this->wa->sendMessage($session->session_id, $contact->wa_number, $reply);

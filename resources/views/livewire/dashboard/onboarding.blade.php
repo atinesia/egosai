@@ -120,7 +120,7 @@
         {{-- STEP 4: Hubungkan WhatsApp --}}
         @if ($step === 4)
             <h2 class="text-lg font-semibold mb-1">Hubungkan WhatsApp</h2>
-            <p class="text-sm text-slate-500 mb-5">Scan QR dengan nomor yang mau dipakai untuk layanan pelanggan. Bisa dilakukan nanti juga dari Dashboard.</p>
+            <p class="text-sm text-slate-500 mb-5">Scan QR dengan nomor yang mau dipakai untuk layanan pelanggan. Bisa dilakukan nanti dari menu <strong>Nomor WhatsApp</strong>.</p>
 
             @if ($waErrorMessage)
                 <div class="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3.5 py-3 text-left">
@@ -131,6 +131,12 @@
 
             <div wire:poll.3s="refreshWhatsappStatus" class="text-center py-4">
                 @if (! $waSession || $waSession->status === 'disconnected')
+                    <div class="text-left mb-3">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Beri nama nomor ini</label>
+                        <input type="text" wire:model="waLabel"
+                               placeholder="cth: CS Utama / Sales / Nomor Toko"
+                               class="w-full rounded-lg border-slate-300 focus:border-teal-500 focus:ring-teal-500">
+                    </div>
                     <button wire:click="connectWhatsapp" wire:loading.attr="disabled" wire:target="connectWhatsapp"
                             class="bg-teal-600 hover:bg-teal-700 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg inline-flex items-center gap-2">
                         <span wire:loading.remove wire:target="connectWhatsapp">Tampilkan QR</span>
@@ -145,10 +151,11 @@
                         <p class="text-xs text-slate-400">Menunggu QR dari server...</p>
                         <p class="text-xs text-slate-400 mt-2 max-w-xs mx-auto">Kalau lebih dari 15 detik, cek apakah Node service WhatsApp sudah dijalankan.</p>
                     @endif
-                    <p class="text-xs text-slate-400 mt-3">Buka WhatsApp di HP → Perangkat Tertaut → Scan kode ini.</p>
+                    <p class="text-xs text-slate-400 mt-3">Buka WhatsApp di HP → <strong>Perangkat Tertaut</strong> → <strong>Tautkan Perangkat</strong> → Scan kode ini.</p>
                 @elseif ($waSession->status === 'connected')
                     <div class="text-teal-600 text-3xl mb-2">✓</div>
-                    <p class="text-sm font-medium">Terhubung dengan {{ $waSession->phone_number }}</p>
+                    <p class="text-sm font-medium">Terhubung: "{{ $waSession->label }}" ({{ $waSession->phone_number }})</p>
+                    <p class="text-xs text-slate-400 mt-1">Kamu bisa tambah nomor lain nanti dari menu Nomor WhatsApp.</p>
                 @endif
             </div>
         @endif
