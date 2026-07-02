@@ -80,8 +80,10 @@
     <header class="sticky top-0 z-40 backdrop-blur bg-[var(--paper)]/85 border-b border-black/5">
         <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2">
-                <span class="w-8 h-8 rounded-lg bg-[var(--teal)] flex items-center justify-center text-white font-display font-bold text-sm">B</span>
-                <span class="font-display font-bold text-[15px]">{{ config('app.name', 'Balas') }}</span>
+                {{-- <span class="w-8 h-8 rounded-lg bg-[var(--teal)] flex items-center justify-center text-white font-display font-bold text-sm">B</span> --}}
+                <img src="{{asset('logo-egos.png')}}" alt="" srcset="" class="w-50 h-15">
+                {{-- <span class="font-display font-bold text-[15px]">
+                </span> --}}
             </a>
             <nav class="hidden md:flex items-center gap-8 text-[14px] font-medium text-[var(--ink-soft)]">
                 <a href="#cara-kerja" class="hover:text-[var(--ink)] transition-colors">Cara kerja</a>

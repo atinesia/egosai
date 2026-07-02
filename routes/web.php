@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\TripayCallbackController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Dashboard\AiSettings;
@@ -11,6 +12,7 @@ use App\Livewire\Dashboard\Onboarding;
 use App\Livewire\Dashboard\QuickReplyManager;
 use App\Livewire\Dashboard\Reports;
 use App\Livewire\Dashboard\WhatsappManager;
+use App\Livewire\Dashboard\BillingManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +36,8 @@ Route::middleware(['auth', 'ensure.tenant'])->group(function () {
     Route::get('/onboarding', Onboarding::class)->name('onboarding');
 });
 
+Route::post('/tripay/callback', [TripayCallbackController::class, 'handleCallback']);
+
 // Dashboard (perlu login + tenant aktif + sudah onboarding)
 Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded'])->prefix('dashboard')->group(function () {
     Route::get('/inbox', Inbox::class)->name('dashboard.inbox');
@@ -44,4 +48,5 @@ Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded'])->prefix('dashbo
     Route::get('/whatsapp', WhatsappManager::class)->name('dashboard.whatsapp');
     Route::get('/quick-replies', QuickReplyManager::class)->name('dashboard.quick-replies');
     Route::get('/broadcast', BroadcastManager::class)->name('dashboard.broadcast');
+    Route::get('/billing', BillingManager::class)->name('dashboard.billing');
 });
