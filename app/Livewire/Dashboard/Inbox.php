@@ -6,6 +6,7 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\WhatsappSession;
 use App\Services\WhatsappService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Inbox extends Component
@@ -39,7 +40,7 @@ class Inbox extends Component
         Message::create([
             'conversation_id' => $conversation->id,
             'sender_type'     => 'agent',
-            'user_id'         => auth()->id(),
+            'user_id'         => Auth::id(),
             'content'         => $this->newMessage,
         ]);
 
@@ -71,11 +72,13 @@ class Inbox extends Component
         $sessions = WhatsappSession::orderBy('label')->get();
 
         $conversations = Conversation::with(['contact', 'latestMessage', 'whatsappSession'])
-            ->when($this->filterSessionId, fn ($q) => $q->where('whatsapp_session_id', $this->filterSessionId))
+            ->when($this->filterSessionId, fn($q) => $q->where('whatsapp_session_id', $this->filterSessionId))
             ->when($this->search, function ($q) {
-                $q->whereHas('contact', fn ($q2) =>
+                $q->whereHas(
+                    'contact',
+                    fn($q2) =>
                     $q2->where('name', 'like', "%{$this->search}%")
-                       ->orWhere('wa_number', 'like', "%{$this->search}%")
+                        ->orWhere('wa_number', 'like', "%{$this->search}%")
                 );
             })
             ->orderByDesc('last_message_at')
@@ -85,7 +88,37 @@ class Inbox extends Component
             ?->load(['messages.user', 'contact', 'whatsappSession']);
 
         return view('livewire.dashboard.inbox', compact(
-            'conversations', 'activeConversation', 'sessions'
+            'conversations',
+            'activeConversation',
+            'sessions'
         ))->layout('layouts.app');
+    }
+
+    /**
+     * Daftarkan listener secara dinamis berdasarkan Tenant ID user yang sedang login
+     */
+    protected function getListeners()
+    {
+        $tenantId = Auth::user()->tenant_id;
+
+        return [
+            // Format: "echo-private:channel,EventName" => "namaMethod"
+            "echo-private:tenant.{$tenantId},MessageReceived" => 'handleIncomingMessage',
+        ];
+    }
+
+    /**
+     * Handler untuk memproses pesan masuk dari WebSocket
+     */
+    public function handleIncomingMessage($payload): void
+    {
+        // Cek jika chat yang sedang dibuka adalah chat yang menerima pesan baru
+        if ($this->activeConversationId == $payload['messageData']['conversation_id']) {
+            // Trigger JavaScript untuk scroll otomatis ke bawah
+            $this->dispatch('scroll-to-bottom');
+        }
+
+        // Paksa Livewire memuat ulang data terbaru ke view
+        $this->render();
     }
 }

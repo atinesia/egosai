@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NewMessageReceived;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Conversation;
@@ -94,12 +95,16 @@ class WhatsappWebhookController extends Controller
         );
         $conversation->update(['last_message_at' => now()]);
 
-        Message::create([
+        $incomingMessage = Message::create([
             'conversation_id' => $conversation->id,
             'sender_type'     => 'contact',
             'content'         => $data['text'],
             'wa_message_id'   => $data['wa_message_id'] ?? null,
         ]);
+
+        // Broadcast ke Reverb — semua agent tenant yang sedang online di inbox
+        // akan dapat notifikasi real-time + browser notification
+        NewMessageReceived::dispatch($incomingMessage, $conversation);
 
         // AI aktif hanya kalau:
         //   1. global AI setting tenant aktif
