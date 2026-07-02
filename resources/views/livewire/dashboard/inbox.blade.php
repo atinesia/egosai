@@ -121,10 +121,55 @@
             </div>
 
             <!-- Input balas -->
-            <form wire:submit="sendReply" class="p-4 border-t border-slate-200 bg-white flex gap-2">
-                <input type="text" wire:model="newMessage" placeholder="Tulis balasan manual..."
+            <form wire:submit="sendReply" class="p-4 border-t border-slate-200 bg-white flex gap-2 relative"
+                x-data="{
+                    showDropdown: false,
+                    searchQuery: '',
+                    // Mengubah data PHP Collection dijadikan objek Array JavaScript lewat JSON
+                    replies: {{ json_encode($quickReplies) }},
+                    get filteredReplies() {
+                        if (!this.searchQuery) return this.replies;
+                        return this.replies.filter(r => r.shortcut.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                    },
+                    checkInput(val) {
+                        // Jika user mengetik karakter / di awal atau di posisi mana pun, picu dropdown melayang
+                        if (val.startsWith('/')) {
+                            this.showDropdown = true;
+                            this.searchQuery = val.substring(1); // ambil text setelah garis miring untuk filter search
+                        } else {
+                            this.showDropdown = false;
+                        }
+                    },
+                    selectReply(message) {
+                        // Set nilai ke input model Livewire dan sembunyikan dropdown
+                        @this.set('newMessage', message);
+                        this.showDropdown = false;
+                        // Kembalikan fokus ke kolom input chat
+                        $refs.chatInput.focus();
+                    }
+                }">
+
+                <div x-show="showDropdown && filteredReplies.length > 0" x-transition
+                    @click.outside="showDropdown = false"
+                    class="absolute bottom-20 left-4 w-80 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+                    <div
+                        class="p-2 bg-slate-50 border-b border-slate-100 text-xxs font-semibold text-slate-400 tracking-wider uppercase">
+                        Pilih Balasan Cepat (Pintasan)
+                    </div>
+                    <template x-for="item in filteredReplies" :key="item.id">
+                        <button type="button" @click="selectReply(item.message)"
+                            class="w-full text-left px-4 py-2.5 hover:bg-teal-50 border-b border-slate-50 last:border-0 transition flex flex-col">
+                            <span class="text-xs font-bold text-teal-600 font-mono" x-text="'/' + item.shortcut"></span>
+                            <span class="text-xs text-slate-500 truncate w-full mt-0.5" x-text="item.message"></span>
+                        </button>
+                    </template>
+                </div>
+
+                <input type="text" wire:model="newMessage" x-ref="chatInput" @input="checkInput($event.target.value)"
+                    @keydown.escape="showDropdown = false"
+                    placeholder="Tulis balasan manual... (Ketik '/' untuk menggunakan template balasan cepat)"
                     wire:loading.attr="disabled" wire:target="sendReply"
-                    class="flex-1 rounded-lg border-slate-300 focus:border-teal-500 focus:ring-teal-500 disabled:bg-slate-50">
+                    class="flex-1 rounded-lg border-slate-300 focus:border-teal-500 focus:ring-teal-500 disabled:bg-slate-50 text-sm">
                 <button type="submit" wire:loading.attr="disabled" wire:target="sendReply"
                     class="bg-teal-600 hover:bg-teal-700 disabled:opacity-70 disabled:cursor-not-allowed
                                text-white px-4 rounded-lg text-sm font-medium flex items-center gap-2 min-w-22 justify-center">
@@ -141,7 +186,7 @@
     </div>
     <!-- Elemen Audio Tersembunyi (Gunakan file audio ringkas .mp3 bebas royalti pilihan Anda) -->
     <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav" preload="auto"></audio>
-    
+
     <script>
         document.addEventListener('livewire:init', () => {
             // Mendengarkan trigger audio dari backend Livewire

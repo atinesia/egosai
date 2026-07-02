@@ -4,6 +4,7 @@ namespace App\Livewire\Dashboard;
 
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\QuickReply;
 use App\Models\WhatsappSession;
 use App\Services\WhatsappService;
 use Illuminate\Support\Facades\Auth;
@@ -87,10 +88,14 @@ class Inbox extends Component
         $activeConversation = $this->activeConversation()
             ?->load(['messages.user', 'contact', 'whatsappSession']);
 
+        // AMBIL DATA TEMPLATE QUICK REPLY MILIK TENANT INI
+        $quickReplies = QuickReply::orderBy('shortcut')->get();
+
         return view('livewire.dashboard.inbox', compact(
             'conversations',
             'activeConversation',
-            'sessions'
+            'sessions',
+            'quickReplies', // Daftarkan variabel ini ke view
         ))->layout('layouts.app');
     }
 

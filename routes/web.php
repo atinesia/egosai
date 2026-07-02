@@ -7,8 +7,8 @@ use App\Livewire\Dashboard\Contacts;
 use App\Livewire\Dashboard\Inbox;
 use App\Livewire\Dashboard\KnowledgeBaseManager;
 use App\Livewire\Dashboard\Onboarding;
+use App\Livewire\Dashboard\QuickReplyManager;
 use App\Livewire\Dashboard\Reports;
-// use App\Livewire\Dashboard\WhatsappConnect;
 use App\Livewire\Dashboard\WhatsappManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -41,4 +41,5 @@ Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded'])->prefix('dashbo
     Route::get('/knowledge-base', KnowledgeBaseManager::class)->name('dashboard.knowledge-base');
     Route::get('/ai-settings', AiSettings::class)->name('dashboard.ai-settings');
     Route::get('/whatsapp', WhatsappManager::class)->name('dashboard.whatsapp');
+    Route::get('/quick-replies', QuickReplyManager::class)->name('dashboard.quick-replies');
 });
