@@ -3,6 +3,7 @@
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Dashboard\AiSettings;
+use App\Livewire\Dashboard\BroadcastManager;
 use App\Livewire\Dashboard\Contacts;
 use App\Livewire\Dashboard\Inbox;
 use App\Livewire\Dashboard\KnowledgeBaseManager;
@@ -42,4 +43,5 @@ Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded'])->prefix('dashbo
     Route::get('/ai-settings', AiSettings::class)->name('dashboard.ai-settings');
     Route::get('/whatsapp', WhatsappManager::class)->name('dashboard.whatsapp');
     Route::get('/quick-replies', QuickReplyManager::class)->name('dashboard.quick-replies');
+    Route::get('/broadcast', BroadcastManager::class)->name('dashboard.broadcast');
 });

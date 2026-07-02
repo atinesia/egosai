@@ -47,6 +47,9 @@
                 <a href="{{ route('dashboard.quick-replies') }}"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.quick-replies') ? 'bg-slate-800 text-white' : '' }}">⚡
                     Balasan Cepat</a>
+                <a href="{{ route('dashboard.broadcast') }}"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.broadcast') ? 'bg-slate-800 text-white' : '' }}">📢
+                    Broadcast</a>
             </nav>
 
             <!-- Notif bell + avatar di footer sidebar -->
