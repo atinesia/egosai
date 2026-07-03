@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="egosGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0066ff"/>
+      <stop offset="50%" stop-color="#00ccff"/>
+      <stop offset="100%" stop-color="#66ffff"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M 390 40 Q 390 80 430 80 Q 390 80 390 120 Q 390 80 350 80 Q 390 80 390 40 Z" fill="url(#egosGrad)" />
+
+  <path d="M 230 140 C 318 140 390 212 390 300 C 390 388 318 460 230 460 C 142 460 70 388 70 300 C 70 212 142 140 230 140 Z M 230 210 C 180 210 140 250 140 300 C 140 350 180 390 230 390 C 280 390 320 350 320 300 C 320 250 280 210 230 210 Z" fill="url(#egosGrad)" />
+
+  <path d="M 60 440 C 50 410 120 320 220 240 C 320 160 420 110 440 130 C 460 150 400 230 300 310 C 200 390 80 460 60 440 Z" fill="none" stroke="url(#egosGrad)" stroke-width="28" stroke-linecap="round" />
+</svg>
