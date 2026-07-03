@@ -15,7 +15,9 @@ class Broadcast extends Model
         'status',
         'total_contacts',
         'sent_count',
-        'failed_count'
+        'failed_count',
+        'whatsapp_session_id',
+        'target_type'
     ];
 
     public function logs()

@@ -32,10 +32,19 @@ class ProcessBroadcastJob implements ShouldQueue
 
         $broadcast->update(['status' => 'processing']);
 
-        // 1. Ambil nomor WhatsApp yang sedang aktif/connected milik tenant ini
-        $activeSessions = $broadcast->tenant->whatsappSessions()
-            ->where('status', 'connected')
-            ->get();
+        // 1. Tentukan nomor WhatsApp yang akan digunakan
+        if ($broadcast->target_type === 'device' && $broadcast->whatsapp_session_id) {
+            // Jika dikunci ke 1 device tertentu
+            $activeSessions = $broadcast->tenant->whatsappSessions()
+                ->where('id', $broadcast->whatsapp_session_id)
+                ->where('status', 'connected')
+                ->get();
+        } else {
+            // Jika 'all', ambil semua nomor yang aktif terhubung (Smart Rotator Aktif)
+            $activeSessions = $broadcast->tenant->whatsappSessions()
+                ->where('status', 'connected')
+                ->get();
+        }
 
         if ($activeSessions->isEmpty()) {
             $broadcast->update(['status' => 'failed']);

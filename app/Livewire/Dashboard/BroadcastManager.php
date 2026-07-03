@@ -15,19 +15,25 @@ class BroadcastManager extends Component
     use WithPagination;
 
     public $broadcasts;
+    public  $devices; // Untuk menampung daftar nomor WA
     public string $name, $message;
     public $targetType = 'all'; // Pilihan pengiriman (contoh: all)
+    public $selectedSessionId = null; // Menampung ID device pilihan
     public $isModalOpen = false;
 
     protected $rules = [
         'name' => 'required|string|max:100',
         'message' => 'required|string|max:5000',
+        'targetType' => 'required|in:all,device',
     ];
 
     public function render()
     {
+        $tenant = Auth::user()->tenant;
         // Mengambil histori broadcast milik tenant
-        $this->broadcasts = Broadcast::latest()->get();
+        $this->broadcasts = Broadcast::with('logs')->latest()->get();
+        // Ambil semua nomor WA milik tenant untuk pilihan di modal
+        $this->devices = $tenant->whatsappSessions()->get();
 
         return view('livewire.dashboard.broadcast-manager')
             ->layout('layouts.app');
@@ -37,12 +43,20 @@ class BroadcastManager extends Component
     {
         $this->name = '';
         $this->message = '';
+        $this->targetType = 'all';
+        $this->selectedSessionId = null;
         $this->isModalOpen = true;
     }
 
     public function sendBroadcast()
     {
-        $this->validate();
+        // Validasi kondisional: Jika targetnya device, maka pilihan device wajib diisi
+        $this->validate(array_merge($this->rules, [
+            'selectedSessionId' => $this->targetType === 'device' ? 'required|exists:whatsapp_sessions,id' : 'nullable'
+        ]), [
+            'selectedSessionId.required' => 'Silakan pilih nomor WhatsApp pengirim.'
+        ]);
+
         $tenantId = Auth::user()->tenant_id;
 
         // 1. Ambil target kontak sesuai kriteria filter
@@ -57,8 +71,10 @@ class BroadcastManager extends Component
         // 2. Buat data Induk Kampanye
         $broadcast = Broadcast::create([
             'tenant_id' => $tenantId,
+            'whatsapp_session_id' => $this->targetType === 'device' ? $this->selectedSessionId : null,
             'name' => $this->name,
             'message' => $this->message,
+            'target_type' => $this->targetType,
             'status' => 'pending',
             'total_contacts' => $contacts->count(),
         ]);

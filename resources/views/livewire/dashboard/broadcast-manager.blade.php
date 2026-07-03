@@ -98,7 +98,35 @@
                                     <span class="text-xs text-red-600 mt-1 block font-medium">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Target Penerima
+                                    Broadcast</label>
+                                <select wire:model.live="targetType"
+                                    class="mt-1.5 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-lg shadow-none">
+                                    <option value="all">Kirim ke Semua Kontak (Smart Rotator Multi-Device)</option>
+                                    <option value="device">Filter Berdasarkan Nomor WhatsApp Tertentu</option>
+                                </select>
+                            </div>
 
+                            @if ($targetType === 'device')
+                                <div x-transition>
+                                    <label class="block text-sm font-semibold text-gray-700">Pilih Nomor WhatsApp
+                                        Pengirim</label>
+                                    <select wire:model="selectedSessionId"
+                                        class="mt-1.5 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-lg shadow-none">
+                                        <option value="">-- Pilih Nomor Pengirim --</option>
+                                        @foreach ($devices as $device)
+                                            <option value="{{ $device->id }}">{{ $device->name }}
+                                                ({{ $device->phone_number ?? $device->session_id }}) -
+                                                {{ $device->status }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('selectedSessionId')
+                                        <span
+                                            class="text-xs text-red-600 mt-1 block font-medium">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endif
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700">Isi Pesan WhatsApp</label>
                                 <textarea wire:model="message" rows="6"
