@@ -39,7 +39,7 @@ Route::middleware(['auth', 'ensure.tenant'])->group(function () {
 Route::post('/tripay/callback', [TripayCallbackController::class, 'handleCallback']);
 
 // Dashboard (perlu login + tenant aktif + sudah onboarding)
-Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded'])->prefix('dashboard')->group(function () {
+Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded', 'tenant.subscription'])->prefix('dashboard')->group(function () {
     Route::get('/inbox', Inbox::class)->name('dashboard.inbox');
     Route::get('/contacts', Contacts::class)->name('dashboard.contacts');
     Route::get('/reports', Reports::class)->name('dashboard.reports');

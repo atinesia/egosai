@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('plan')->default('trial'); // trial, starter, pro, enterprise
             $table->boolean('is_active')->default(true);
-            $table->timestamp('trial_ends_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });
     }

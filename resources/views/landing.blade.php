@@ -96,7 +96,7 @@
             <div class="flex items-center gap-3">
                 <a href="{{ route('login') }}" class="hidden sm:inline text-[14px] font-medium text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors">Masuk</a>
                 <a href="{{ route('register') }}" class="bg-[var(--ink)] hover:bg-[var(--teal-deep)] transition-colors text-white text-[14px] font-medium px-4 py-2 rounded-lg">
-                    Coba Gratis 14 Hari
+                    Coba Gratis 7 Hari
                 </a>
             </div>
         </div>

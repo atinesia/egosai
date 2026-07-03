@@ -31,7 +31,7 @@ class Register extends Component
             'name' => $this->business_name,
             'slug' => Str::slug($this->business_name) . '-' . Str::random(5),
             'plan' => 'trial',
-            'trial_ends_at' => now()->addDays(14),
+            'trial_ends_at' => now()->addDays(7),
         ]);
 
         $user = User::create([

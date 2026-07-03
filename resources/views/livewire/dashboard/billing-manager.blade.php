@@ -41,10 +41,23 @@
                                 WhatsApp</strong>
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-teal-600">✓</span> Full AI Auto Reply & Knowledge Base
+                            @if ($key === 'starter')
+                                <span class="text-teal-600">✓</span> Limit Blast: <strong>1.000 / bln</strong>
+                            @elseif($key === 'pro')
+                                <span class="text-teal-600">✓</span> Limit Blast: <strong>10.000 / bln + Smart
+                                    Rotator</strong>
+                            @else
+                                <span class="text-teal-600">✓</span> Limit Blast: <strong>UNLIMITED + Priority
+                                    Rotator</strong>
+                            @endif
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-teal-600">✓</span> Real-time Live Chat Inbox
+                            <span class="text-teal-600">✓</span> AI Engine:
+                            <strong>{{ $key === 'starter' ? 'Standard AI (8B)' : 'Ultra Smart AI (70B)' }}</strong>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-teal-600">✓</span> Akses Agen CS:
+                            <strong>{{ $key === 'starter' ? '1 User' : ($key === 'pro' ? 'Maks 5 CS' : 'Unlimited CS') }}</strong>
                         </li>
                     </ul>
                 </div>
