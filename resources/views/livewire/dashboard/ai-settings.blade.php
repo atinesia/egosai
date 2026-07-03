@@ -11,14 +11,14 @@
             Aktifkan AI auto-reply untuk seluruh percakapan masuk
         </label>
 
-        <div>
+        {{-- <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Model Groq</label>
             <select wire:model="model" class="w-full rounded-lg border-slate-300 text-sm focus:border-teal-500 focus:ring-teal-500">
                 <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (seimbang)</option>
                 <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (cepat & murah)</option>
                 <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
             </select>
-        </div>
+        </div> --}}
 
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Prompt Kepribadian AI</label>

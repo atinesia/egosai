@@ -57,6 +57,14 @@ class BroadcastManager extends Component
             'selectedSessionId.required' => 'Silakan pilih nomor WhatsApp pengirim.'
         ]);
 
+        $tenant = Auth::user()->tenant;
+
+        // Jika paket starter nekat menembak payload 'device', paksa kembali ke 'all'
+        if ($tenant->plan === 'starter' && $this->targetType === 'device') {
+            $this->targetType = 'all';
+        }
+
+
         $tenantId = Auth::user()->tenant_id;
 
         // 1. Ambil target kontak sesuai kriteria filter

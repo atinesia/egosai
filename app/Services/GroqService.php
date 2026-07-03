@@ -28,7 +28,7 @@ class GroqService
         $knowledge = KnowledgeBase::where('tenant_id', $tenant->id)
             ->where('is_active', true)
             ->get()
-            ->map(fn ($k) => "## {$k->title}\n{$k->content}")
+            ->map(fn($k) => "## {$k->title}\n{$k->content}")
             ->implode("\n\n");
 
         $systemPrompt = $aiSetting->system_prompt
@@ -58,11 +58,17 @@ class GroqService
             [['role' => 'user', 'content' => $incomingMessage]],
         );
 
+        // Tentukan model berdasarkan paket tenant
+        $model = ($tenant->plan === 'starter')
+            ? 'llama3-8b-8192'         // Model standar, hemat token, cepat
+            : 'llama-3.3-70b-versatile'; // Model raksasa, ultra cerdas untuk Pro/Enterprise
+
         try {
             $response = Http::withToken(config('services.groq.api_key'))
                 ->timeout(30)
                 ->post($this->baseUrl, [
-                    'model' => $aiSetting->model,
+                    'model' => $model,
+                    // 'model' => $aiSetting->model,
                     'messages' => $messages,
                     'temperature' => (float) $aiSetting->temperature,
                     'max_tokens' => 1024,

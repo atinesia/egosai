@@ -101,11 +101,21 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700">Target Penerima
                                     Broadcast</label>
-                                <select wire:model.live="targetType"
-                                    class="mt-1.5 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-lg shadow-none">
-                                    <option value="all">Kirim ke Semua Kontak (Smart Rotator Multi-Device)</option>
-                                    <option value="device">Filter Berdasarkan Nomor WhatsApp Tertentu</option>
-                                </select>
+                                @if (auth()->user()->tenant->plan === 'starter' || auth()->user()->tenant->plan === 'trial')
+                                    <select disabled
+                                        class="mt-1.5 bg-gray-50 border-gray-300 text-gray-500 block w-full sm:text-sm rounded-lg">
+                                        <option>Kirim ke Semua Kontak (Maks 1 Device)</option>
+                                    </select>
+                                    <span class="text-xxs text-amber-600 mt-1 block">💡 Upgrade ke paket **Pro** untuk
+                                        menikmati fitur *Smart Rotator* Multi-Device agar broadcast lebih aman.</span>
+                                @else
+                                    <select wire:model.live="targetType"
+                                        class="mt-1.5 focus:ring-1 focus:ring-teal-500 block w-full sm:text-sm border-gray-300 rounded-lg">
+                                        <option value="all">Kirim ke Semua Kontak (Smart Rotator Multi-Device)
+                                        </option>
+                                        <option value="device">Filter Berdasarkan Nomor WhatsApp Tertentu</option>
+                                    </select>
+                                @endif
                             </div>
 
                             @if ($targetType === 'device')
@@ -117,7 +127,8 @@
                                         <option value="">-- Pilih Nomor Pengirim --</option>
                                         @foreach ($devices as $device)
                                             <option value="{{ $device->id }}">{{ $device->name }}
-                                                ({{ $device->phone_number ?? $device->session_id }}) -
+                                                ({{ $device->phone_number ?? $device->session_id }})
+                                                -
                                                 {{ $device->status }}</option>
                                         @endforeach
                                     </select>
