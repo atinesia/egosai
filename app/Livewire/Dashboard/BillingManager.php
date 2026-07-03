@@ -33,6 +33,10 @@ class BillingManager extends Component
 
     public function render()
     {
+        // Hanya Owner yang boleh mengakses halaman ini
+        if (Auth::user()->role !== 'owner') {
+            abort(403, 'Anda tidak memiliki hak akses untuk halaman manajemen ini.');
+        }
         // Mengambil riwayat tagihan/order milik tenant aktif
         $this->orders = Order::latest()->get();
 

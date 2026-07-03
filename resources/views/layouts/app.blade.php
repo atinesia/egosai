@@ -56,6 +56,9 @@
                 <a href="{{ route('dashboard.billing') }}"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.billing') ? 'bg-slate-800 text-white' : '' }}">💳
                     Billing & Paket</a>
+                <a href="{{ route('dashboard.teams') }}"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 {{ request()->routeIs('dashboard.teams') ? 'bg-slate-800 text-white' : '' }}">👥
+                    Manajemen Tim</a>
             </nav>
 
             <!-- Notif bell + avatar di footer sidebar -->

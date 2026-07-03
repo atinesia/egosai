@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\TripayCallbackController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
+use App\Livewire\Dashboard\AgentManager;
 use App\Livewire\Dashboard\AiSettings;
+use App\Livewire\Dashboard\BillingManager;
 use App\Livewire\Dashboard\BroadcastManager;
 use App\Livewire\Dashboard\Contacts;
 use App\Livewire\Dashboard\Inbox;
@@ -12,7 +14,6 @@ use App\Livewire\Dashboard\Onboarding;
 use App\Livewire\Dashboard\QuickReplyManager;
 use App\Livewire\Dashboard\Reports;
 use App\Livewire\Dashboard\WhatsappManager;
-use App\Livewire\Dashboard\BillingManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -49,4 +50,5 @@ Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded', 'tenant.subscrip
     Route::get('/quick-replies', QuickReplyManager::class)->name('dashboard.quick-replies');
     Route::get('/broadcast', BroadcastManager::class)->name('dashboard.broadcast');
     Route::get('/billing', BillingManager::class)->name('dashboard.billing');
+    Route::get('/teams', AgentManager::class)->name('dashboard.teams');
 });
