@@ -46,7 +46,7 @@ class BroadcastManager extends Component
         $tenantId = Auth::user()->tenant_id;
 
         // 1. Ambil target kontak sesuai kriteria filter
-        $contacts = Contact::get(); // Sementara mengambil semua kontak milik tenant
+        $contacts = Contact::where('tenant_id', $tenantId)->get();
 
         if ($contacts->isEmpty()) {
             session()->flash('error', 'Gagal membuat broadcast. Anda belum memiliki daftar kontak pelanggan.');

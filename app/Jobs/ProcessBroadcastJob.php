@@ -44,7 +44,8 @@ class ProcessBroadcastJob implements ShouldQueue
         }
 
         // 2. Ambil semua log kontak tujuan yang masih berstatus 'pending'
-        $pendingLogs = BroadcastLog::where('broadcast_id', $broadcast->id)
+        $pendingLogs = BroadcastLog::withoutGlobalScopes()
+            ->where('broadcast_id', $broadcast->id)
             ->where('status', 'pending')
             ->with('contact')
             ->get();
