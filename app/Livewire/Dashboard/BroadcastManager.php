@@ -35,7 +35,23 @@ class BroadcastManager extends Component
         // Ambil semua nomor WA milik tenant untuk pilihan di modal
         $this->devices = $tenant->whatsappSessions()->get();
 
-        return view('livewire.dashboard.broadcast-manager')
+        // Hitung untuk dikirim ke view blade
+        $usageThisMonth = Broadcast::where('tenant_id', $tenant->id)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', '!=', 'failed')
+            ->sum('total_contacts');
+        $limit = match ($tenant->plan) {
+            'starter' => 1000,
+            'pro' => 10000,
+            'enterprise' => 'Unlimited',
+            default => 1000
+        };
+
+        return view('livewire.dashboard.broadcast-manager', [
+            'usageThisMonth' => $usageThisMonth,
+            'limitThisMonth' => $limit
+        ])
             ->layout('layouts.app');
     }
 
@@ -67,11 +83,38 @@ class BroadcastManager extends Component
 
         $tenantId = Auth::user()->tenant_id;
 
-        // 1. Ambil target kontak sesuai kriteria filter
+        // 1. Tentukan batas limit blast berdasarkan paket tenant
+        $maxLimit = match ($tenant->plan) {
+            'starter' => 1000,
+            'pro' => 10000,
+            'enterprise' => 9999999, // Anggap saja tidak terbatas
+            default => 1000, // Default untuk trial/starter
+        };
+
+        // 2. Ambil target kontak sesuai kriteria filter
         $contacts = Contact::where('tenant_id', $tenantId)->get();
+        $targetCount = $contacts->count();
 
         if ($contacts->isEmpty()) {
             session()->flash('error', 'Gagal membuat broadcast. Anda belum memiliki daftar kontak pelanggan.');
+            $this->isModalOpen = false;
+            return;
+        }
+
+        // 3. --- CORE LIMIT BLAST FILTER ---
+        // Hitung berapa total pesan blast berstatus 'paid' atau sukses/proses yang dikirim tenant BULAN INI
+        $currentMonthUsage = Broadcast::where('tenant_id', $tenant->id)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', '!=', 'failed')
+            ->sum('total_contacts');
+
+        // Cek apakah sisa kuota mencukupi untuk jumlah target broadcast kali ini
+        if (($currentMonthUsage + $targetCount) > $maxLimit) {
+            $sisaKuota = $maxLimit - $currentMonthUsage;
+            $sisaKuota = $sisaKuota < 0 ? 0 : $sisaKuota;
+
+            session()->flash('error', "Kuota Blast Tidak Mencukupi! Sisa kuota bulan ini: {$sisaKuota} pesan. Kampanye saat ini membutuhkan {$targetCount} pesan. Silakan upgrade paket Anda!");
             $this->isModalOpen = false;
             return;
         }
@@ -84,7 +127,7 @@ class BroadcastManager extends Component
             'message' => $this->message,
             'target_type' => $this->targetType,
             'status' => 'pending',
-            'total_contacts' => $contacts->count(),
+            'total_contacts' => $targetCount,
         ]);
 
         // 3. Buat data detail log penerima berstatus 'pending'

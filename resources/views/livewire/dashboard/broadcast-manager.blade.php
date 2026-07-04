@@ -4,6 +4,10 @@
             <h1 class="text-2xl font-bold text-gray-900 tracking-tight">WhatsApp Broadcast</h1>
             <p class="mt-1 text-sm text-gray-500">Kirim pesan massal secara teratur dan aman menggunakan fitur Smart
                 Rotator multi-device.</p>
+            <p class="mt-1 text-xs text-slate-500">
+                Penggunaan kuota blast bulan ini: <strong>{{ $usageThisMonth }}</strong> dari
+                <strong>{{ $limitThisMonth }}</strong> pesan digunakan.
+            </p>
         </div>
         <div class="mt-4 sm:mt-0">
             <button wire:click="openModal"
