@@ -123,6 +123,25 @@ class WhatsappWebhookController extends Controller
             ]);
 
             $this->wa->sendMessage($session->session_id, $contact->wa_number, $reply);
+            // --- LOGIKA TAMBAHAN: CEK JIKA AI BARUSAN HANDOVER ---
+            // Refresh model conversation untuk mendapatkan data ai_active terbaru dari database
+            $conversation->refresh();
+
+            if (!$conversation->ai_active && is_null($conversation->assigned_user_id)) {
+                // Panggil routing service untuk membagikan chat ke agen terpilih
+                $router = app(\App\Services\ChatRoutingService::class);
+                $router->assignToNextAvailableAgent($conversation);
+
+                // Trigger ulang event broadcast agar dashboard agen langsung memperbarui antrean spesifiknya
+                \App\Events\NewMessageReceived::dispatch($incomingMessage, $conversation);
+            }
+            // -----------------------------------------------------
+        } else {
+            // JIKA AI SUDAH MATI dari awal, dan ada pesan baru masuk, pastikan dialokasikan jika belum ada agen
+            if (is_null($conversation->assigned_user_id)) {
+                $router = app(\App\Services\ChatRoutingService::class);
+                $router->assignToNextAvailableAgent($conversation);
+            }
         }
 
         return response()->json(['ok' => true]);

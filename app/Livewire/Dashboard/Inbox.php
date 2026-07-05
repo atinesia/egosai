@@ -38,6 +38,15 @@ class Inbox extends Component
         $conversation = $this->activeConversation();
         if (! $conversation) return;
 
+        // --- LOGIKA TAMBAHAN: MANUAL TAKEOVER ---
+        // Jika agen membalas secara manual, otomatis matikan AI pada percakapan ini
+        $aiTurnedOff = false;
+        if ($conversation->ai_active) {
+            $conversation->ai_active = false;
+            $aiTurnedOff = true;
+        }
+        // ----------------------------------------
+
         Message::create([
             'conversation_id' => $conversation->id,
             'sender_type'     => 'agent',
@@ -45,7 +54,12 @@ class Inbox extends Component
             'content'         => $this->newMessage,
         ]);
 
-        $conversation->update(['last_message_at' => now(), 'status' => 'open']);
+        // Update status ke open, set timestamp, dan simpan perubahan ai_active jika ada
+        $conversation->update([
+            'last_message_at' => now(),
+            'status'          => 'open',
+            'ai_active'       => $conversation->ai_active
+        ]);
 
         // Kirim lewat sesi WA yang sama dengan yang menerima pesan dari pelanggan ini
         $session = $conversation->whatsappSession;
@@ -54,6 +68,10 @@ class Inbox extends Component
         }
 
         $this->newMessage = '';
+        // Opsional: Kirim notifikasi toast ke browser agen jika AI berhasil dimatikan
+        if ($aiTurnedOff) {
+            $this->dispatch('notify', ['message' => 'AI dinonaktifkan karena Anda mengambil alih obrolan.', 'type' => 'info']);
+        }
     }
 
     public function resolveConversation(): void
@@ -71,9 +89,19 @@ class Inbox extends Component
     public function render()
     {
         $sessions = WhatsappSession::orderBy('label')->get();
+        $currentUser = Auth::user();
 
         $conversations = Conversation::with(['contact', 'latestMessage', 'whatsappSession'])
+            ->where('tenant_id', $currentUser->tenant_id) // Pastikan terisolasi per tenant
             ->when($this->filterSessionId, fn($q) => $q->where('whatsapp_session_id', $this->filterSessionId))
+            ->when($currentUser->role !== 'admin', function ($q) use ($currentUser) {
+                // Jika dia bukan admin (alias CS biasa), HANYA tampilkan chat yang di-assign ke dirinya
+                // atau chat yang masih kosong belum teralokasi
+                $q->where(function ($sub) use ($currentUser) {
+                    $sub->where('assigned_user_id', $currentUser->id)
+                        ->orWhereNull('assigned_user_id');
+                });
+            })
             ->when($this->search, function ($q) {
                 $q->whereHas(
                     'contact',
