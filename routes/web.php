@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\TripayCallbackController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Dashboard\AgentManager;
@@ -36,8 +35,6 @@ Route::post('/logout', function () {
 Route::middleware(['auth', 'ensure.tenant'])->group(function () {
     Route::get('/onboarding', Onboarding::class)->name('onboarding');
 });
-
-Route::post('/tripay/callback', [TripayCallbackController::class, 'handleCallback']);
 
 // Dashboard (perlu login + tenant aktif + sudah onboarding)
 Route::middleware(['auth', 'ensure.tenant', 'ensure.onboarded', 'tenant.subscription'])->prefix('dashboard')->group(function () {
